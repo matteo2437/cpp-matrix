@@ -1,51 +1,27 @@
+#include "Matrix2DBase.hpp"
 #include "Matrix1D.hpp"
 #include <math.h>
 #include <iostream>
 
 using namespace std;
 
-
-typedef unsigned int CoordValue;
-
-typedef struct {
-    CoordValue row;
-    CoordValue column;
-} Coords;
-
 template <class T>
-class Matrix2D {
+class Matrix2D: public Matrix2DBase<T> {
     public:
-        CoordValue nRows;
-        CoordValue nCols;
-        T* matrix;
+    Matrix2D(UInt nRows, UInt nCols);
 
-        Matrix2D(CoordValue nRows, CoordValue nCols);
-        
-        bool setElement(CoordValue row, CoordValue col, T value);
-        T getElement(CoordValue row, CoordValue col);
+    Matrix1D<T> getRowMatrix (CoordValue row);
+    Matrix1D<T> getColumnMatrix (CoordValue column);
 
-        Matrix1D<T> getRowMatrix (CoordValue row);
-        Matrix1D<T> getColumnMatrix (CoordValue column);
-
-        Matrix2D<T> operator + (Matrix2D<T> matrix);
-        Matrix2D<T> operator - (Matrix2D<T> matrix);
-        Matrix2D operator * (Matrix2D<T> matrix);
+    Matrix2D<T> operator + (Matrix2D<T> matrix);
+    Matrix2D<T> operator - (Matrix2D<T> matrix);
+    Matrix2D operator * (Matrix2D<T> matrix);
 
     private:
-        unsigned int getPos(CoordValue row, CoordValue col);
-        Coords getCoords(int pos);
-        unsigned int getLength();
-        bool sameSize(Matrix2D<T> matrix);
+    bool sameSize(Matrix2D<T> matrix);
 };
 
 /******************************************************************************************/
-
-template <class T>
-Matrix2D<T>::Matrix2D(CoordValue nRows, CoordValue nCols) {
-    this->nRows = nRows;
-    this->nCols = nCols;
-    this->matrix = new T[this->getLength()];
-}
 
 template <class T>
 Matrix1D<T> Matrix2D<T>::getRowMatrix(CoordValue row)  {
@@ -72,18 +48,8 @@ Matrix1D<T> Matrix2D<T>::getColumnMatrix(CoordValue column)  {
 }
 
 template <class T>
-bool Matrix2D<T>::setElement(CoordValue row, CoordValue col, T value) {
-    if(row >= nRows || col >= nCols)
-        return false;
-
-    this->matrix[this->getPos(row, col)] = value;
-    return true;
-}
-
-template <class T>
-T Matrix2D<T>::getElement(CoordValue row, CoordValue col) {
-    return this->matrix[this->getPos(row, col)];
-}
+Matrix2D<T>::Matrix2D(UInt nRows, UInt nCols) : 
+    Matrix2DBase<T>(nRows, nCols) { }
 
 template <class T>
 Matrix2D<T> Matrix2D<T>::operator + (Matrix2D<T> matrix) {
@@ -129,28 +95,6 @@ Matrix2D<T> Matrix2D<T>::operator * (Matrix2D<T> matrix) {
     }
 
     return temp;
-}
-
-template <class T>
-unsigned int Matrix2D<T>::getPos(CoordValue row, CoordValue col) {
-    return row * this->nCols + col;
-}
-
-template <class T>
-Coords Matrix2D<T>::getCoords(int pos) {
-    unsigned int row = round(pos / this->nCols);
-    unsigned int column = pos - (row * this->nCols);
-    Coords c;
-
-    c.row = row;
-    c.column = column;
-
-    return c;
-}
-
-template <class T>
-unsigned int Matrix2D<T>::getLength() {
-    return this->nCols * this->nRows;
 }
 
 template <class T>
